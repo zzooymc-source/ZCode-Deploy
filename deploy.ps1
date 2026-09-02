@@ -201,28 +201,7 @@ switch ($Action) {
         } else {
             Write-Host "  [警告] 未找到目标" -ForegroundColor Yellow
         }
-        # 补丁 7: 思维链强制 [R] 前置
-        $old7a = 'case"thinking_delta":{J.enqueue({type:"reasoning-delta",id:String(M.index),delta:M.delta.thinking});return}'
-        $new7a = 'case"thinking_delta":{let __rt=M.delta.thinking;if(x[M.index]&&x[M.index].__rfix===void 0){x[M.index].__rfix=1;if(!/^\s*\[R\]/.test(__rt)){J.enqueue({type:"reasoning-delta",id:String(M.index),delta:"[R]\n\n"})}}J.enqueue({type:"reasoning-delta",id:String(M.index),delta:__rt});return}'
-        if ($content.Contains($old7a)) {
-            $content = $content.Replace($old7a, $new7a)
-            Write-Host "  [OK] 思维链流式 [R] 前置已启用" -ForegroundColor Green
-        } elseif ($content.Contains($new7a)) {
-            Write-Host "  [跳过] 已修改过" -ForegroundColor Gray
-        } else {
-            Write-Host "  [警告] 未找到流式目标" -ForegroundColor Yellow
-        }
-        $old7b = 'get reasoningText(){return this.reasoning.length===0?void 0:this.reasoning.map(e=>e.text).join("")}'
-        $new7b = 'get reasoningText(){let t=this.reasoning.length===0?void 0:this.reasoning.map(e=>e.text).join("");return t&&!/^\s*\[R\]/.test(t)?"[R]\n\n"+t:t}'
-        if ($content.Contains($old7b)) {
-            $content = $content.Replace($old7b, $new7b)
-            Write-Host "  [OK] 思维链最终值 [R] 前置已启用" -ForegroundColor Green
-        } elseif ($content.Contains($new7b)) {
-            Write-Host "  [跳过] 已修改过" -ForegroundColor Gray
-        } else {
-            Write-Host "  [警告] 未找到最终值目标" -ForegroundColor Yellow
-        }
-        [System.IO.File]::WriteAllText($ZcodeCjs, $content, [System.Text.UTF8Encoding]::new($false))
+                [System.IO.File]::WriteAllText($ZcodeCjs, $content, [System.Text.UTF8Encoding]::new($false))
         Write-Host "  文件已保存" -ForegroundColor Gray
 
         Write-Host "[4/5] 检查路径..." -ForegroundColor Cyan

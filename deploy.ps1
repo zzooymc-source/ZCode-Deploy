@@ -1,4 +1,4 @@
-﻿# ============================================
+# ============================================
 # ZCode 一键人格部署工具
 # 使用: 右键 -> 使用 PowerShell 运行
 # 或: powershell -ExecutionPolicy Bypass -File deploy.ps1 install
@@ -179,6 +179,17 @@ switch ($Action) {
             Write-Host "  [警告] 未找到目标" -ForegroundColor Yellow
         }
 
+        # 补丁 5: Skills 列表注入移除
+        $old5 = 'function sre(e){if(e.outcome.skills.length===0)return null;let t=iFo(e.outcome.skills,e.metadataBudget??nFo);return{name:"Skills",source:"skills",injectionTarget:"meta_user",cacheHint:"dynamic",chars:t.length,tokens:ns(t),content:t,preview:t.slice(0,100)}}'
+        $new5 = 'function sre(e){return null}'
+        if ($content.Contains($old5)) {
+            $content = $content.Replace($old5, $new5)
+            Write-Host "  [OK] Skills 列表注入已移除" -ForegroundColor Green
+        } elseif ($content.Contains($new5)) {
+            Write-Host "  [跳过] 已修改过" -ForegroundColor Gray
+        } else {
+            Write-Host "  [警告] 未找到目标" -ForegroundColor Yellow
+        }
         [System.IO.File]::WriteAllText($ZcodeCjs, $content, [System.Text.UTF8Encoding]::new($false))
         Write-Host "  文件已保存" -ForegroundColor Gray
 

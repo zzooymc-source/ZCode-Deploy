@@ -190,6 +190,17 @@ switch ($Action) {
         } else {
             Write-Host "  [警告] 未找到目标" -ForegroundColor Yellow
         }
+        # 补丁 6: Request User Context 注入移除
+        $old6 = 'function F1e(e){let t=HFo(e);return t?{name:"Request User Context",source:"request_user_context",injectionTarget:"meta_user",cacheHint:"dynamic",chars:t.length,tokens:ns(t),content:t,preview:t.slice(0,100)}:null}'
+        $new6 = 'function F1e(e){return null}'
+        if ($content.Contains($old6)) {
+            $content = $content.Replace($old6, $new6)
+            Write-Host "  [OK] Request User Context 注入已移除" -ForegroundColor Green
+        } elseif ($content.Contains($new6)) {
+            Write-Host "  [跳过] 已修改过" -ForegroundColor Gray
+        } else {
+            Write-Host "  [警告] 未找到目标" -ForegroundColor Yellow
+        }
         [System.IO.File]::WriteAllText($ZcodeCjs, $content, [System.Text.UTF8Encoding]::new($false))
         Write-Host "  文件已保存" -ForegroundColor Gray
 
